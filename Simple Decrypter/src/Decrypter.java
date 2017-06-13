@@ -7,7 +7,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -29,6 +32,7 @@ public class decrypter {
 	private HashMap<Integer, Character> map;
 	private static Set<String> dict;
 	private static Set<String> textset;
+	private HashMap<Character, ArrayList<Character>> decoderTable;
 	
 	
 	public decrypter(){
@@ -51,6 +55,27 @@ public class decrypter {
 		dc.decrypt();
 	}
 
+	
+	/**
+	 * 
+	 */
+	private void makeDeocderTable(){
+		String alphabet = "abcdefghijklmnopqrstuvwxyz";
+		ArrayList<Character> table = new ArrayList<>();
+		char letter;
+		int i = 0;
+		while (i <= alphabet.length()) {
+			letter = alphabet.charAt(i);
+			table.add(letter);
+			i++;
+		}
+		while (i <= alphabet.length()) {
+			letter = alphabet.charAt(i);
+			decoderTable.put(letter, table);
+			i++;
+		}
+		
+	}
 	
 	/**
 	 * reads the file
@@ -87,24 +112,62 @@ public class decrypter {
 	 * decrypts the string
 	 */
 	private void decrypt(){
+		makeDeocderTable();
 		maketoString();
 		countLetters();
 		printLetterStats();
 		makeWords();
-		cleanString = cleanString.replace( letters.get(1), 'e'); // most used char is e
+		
+//		 set most used char to e
+		ArrayList<Character> e = new ArrayList<Character>();
+		e.add('e');
+		updateTable(letters.get(1), e);
+		
 		decOneLetterWords();
 		decTwoLetterWords();
 		// d seems to be the same char (d) --> idea
 	}
 	
+	private void updateTable(char keyChar, ArrayList<Character> valueChars){
+		Iterator<Entry<Character, ArrayList<Character>>> it = decoderTable.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry<Character, ArrayList<Character>> pair = it.next();
+	        
+	        if(!pair.getKey().equals(keyChar)){
+	        	for (Character letter : pair.getValue()) {
+	        		for (Character valueChar : valueChars) {
+	        			if(letter.equals(valueChar)){
+	        				pair.getValue().remove(letter);
+	        			}
+	        		}
+	        	}
+	        }else{
+	        	pair.setValue(valueChars);
+	        }
+	}
+	}
 	/**
 	 * decrypts words of length one
 	 */
 	private void decOneLetterWords(){
 		ArrayList<String> words1 = new ArrayList<>();
 		words1 = getWordsOfSameLength(1);
-		cleanString = cleanString.replace("v", "i"); // single chars probably are I or a
-		cleanString = cleanString.replace("t", "a"); // single chars probably are I or a
+		ArrayList<Character> singleAIchars = new ArrayList<>();
+		for (String word : words1) {
+			char c= word.charAt(0);
+			if(!singleAIchars.contains(c)){
+				singleAIchars.add(c);
+			}
+		}
+		
+		ArrayList<Character> ai = new ArrayList<Character>();
+		ai.add('a');
+		ai.add('i');
+		updateTable(singleAIchars.get(0), ai);
+		updateTable(singleAIchars.get(1), ai);
+
+//		cleanString = cleanString.replace("v", "i"); // single chars probably are I or a
+//		cleanString = cleanString.replace("t", "a"); // single chars probably are I or a
 	}
 	
 	/**
