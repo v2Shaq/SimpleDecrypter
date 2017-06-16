@@ -19,7 +19,7 @@ import java.util.Set;
  *
  */
 
-public class decrypter {
+public class Decrypter {
 
 	private String text;
 	private String cleanString;
@@ -35,7 +35,7 @@ public class decrypter {
 	private HashMap<Character, ArrayList<Character>> decoderTable;
 	
 	
-	public decrypter(){
+	public Decrypter(){
 		letters = new ArrayList<>();
 		counts = new ArrayList<>();
 		map = new LinkedHashMap<Integer, Character>();
@@ -44,7 +44,7 @@ public class decrypter {
 	}
 	
 	public static void main(String[] args) {
-		decrypter dc = new decrypter();
+		Decrypter dc = new Decrypter();
 		try {
 			textset = dc.readFile( "sample.txt_enc");
 			dict = dc.readFile( "3kMonstCommonWords.txt");
